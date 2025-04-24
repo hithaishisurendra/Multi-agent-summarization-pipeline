@@ -8,9 +8,9 @@ API keys.txt
 https://asurc.atlassian.net/wiki/spaces/RC/pages/1905721457/New+User+Guide
 
 ## Code
-btpnlp.py
+btpnlp.py  
 financial_nlp.py
 
 ## Report
-Project Proposal.pdf
-Intermediate_Progress_Report.pdf
+M1 - Project Proposal.pdf  
+M2 - Intermediate_Progress_Report.pdf
