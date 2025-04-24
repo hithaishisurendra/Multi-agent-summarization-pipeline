@@ -1,4 +1,4 @@
-# AdaptiveTableSummarization
+# Adaptive Table Summarization
 Adaptive Agent-Based Personalized Contextual Table Summarization
 
 ## API Keys
