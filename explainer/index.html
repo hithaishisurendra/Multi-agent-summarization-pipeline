@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Financial QA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.7;
+        }
+
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
+            border-radius: 50%;
+            top: -200px;
+            right: -200px;
+            animation: float 20s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, 30px); }
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            line-height: 1.1;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            margin-bottom: 2rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-num {
+            font-size: 2.5rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .section-tight {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .intro {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .problem-card {
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .problem-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .problem-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .example-box {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .example-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: #764ba2;
+        }
+
+        .question {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        .table-sample {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        .table-sample table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-sample th {
+            background: #667eea;
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table-sample td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .context-snippet {
+            background: #fff9e6;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #fbbf24;
+            margin: 2rem 0;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .pipeline-img {
+            width: 100%;
+            max-width: 900px;
+            margin: 3rem auto;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .step-by-step {
+            margin: 3rem 0;
+        }
+
+        .step {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            position: relative;
+            padding-left: 5rem;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 1.5rem;
+            top: 2rem;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        .step h4 {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+        }
+
+        .step p {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .code-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .agent-output {
+            background: #e8f5e9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .final-answer {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .pipeline-box {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .pipeline-box h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .pro {
+            color: #4caf50;
+            margin: 0.5rem 0;
+        }
+
+        .con {
+            color: #f44336;
+            margin: 0.5rem 0;
+        }
+
+        .metrics {
+            background: #f8f9fa;
+            padding: 3rem;
+            border-radius: 16px;
+            margin: 3rem 0;
+        }
+
+        .metric-bar {
+            margin: 2rem 0;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+        }
+
+        .bar-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .bar {
+            flex: 1;
+            height: 50px;
+            background: #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            color: white;
+            font-weight: 700;
+            transition: width 2s ease;
+        }
+
+        .bar-fill.animate {
+            width: var(--width);
+        }
+
+        .improvement {
+            font-weight: 700;
+            color: #4caf50;
+            font-size: 1.2rem;
+        }
+
+        .rag-highlight {
+            background: #fff3cd;
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 4px solid #ffc107;
+            margin: 2rem 0;
+        }
+
+        .rag-highlight h4 {
+            color: #ff6f00;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .comparison { grid-template-columns: 1fr; }
+            .step { padding-left: 2rem; }
+            .step-number { position: static; margin-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Multi-Agent Financial QA</h1>
+            <p class="tagline">Breaking down complex table-text reasoning into specialized tasks</p>
+            <p style="font-size: 1.1rem; margin-top: 1rem; opacity: 0.9;">Financial documents mix tables with narrative context. Single models struggle with this. I built a system that uses retrieval and specialized agents to handle numerical reasoning, logical inference and personalization.</p>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-num">16,552</span>
+                    <span class="stat-label">Questions</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">2,757</span>
+                    <span class="stat-label">Financial Docs</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">74.1%</span>
+                    <span class="stat-label">Peak Accuracy</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">3</span>
+                    <span class="stat-label">Specialized Agents</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Problem -->
+    <div class="section-tight">
+        <h2>The Problem</h2>
+        <p class="intro">TAT-QA is a benchmark where every question requires looking at both a table and text. Models fail at this consistently.</p>
+
+        <div class="problem-grid">
+            <div class="problem-card">
+                <h3>Numerical Errors</h3>
+                <p>Multi-step calculations break down. Models hallucinate numbers or lose track of intermediate steps.</p>
+            </div>
+            <div class="problem-card">
+                <h3>Context Misalignment</h3>
+                <p>Text describes the table, but models fail to map descriptions to specific rows and columns.</p>
+            </div>
+            <div class="problem-card">
+                <h3>Token Limits</h3>
+                <p>Financial reports are long. Cramming everything into context means noise overwhelms signal.</p>
+            </div>
+            <div class="problem-card">
+                <h3>No Specialization</h3>
+                <p>Arithmetic questions need different reasoning than logical questions, but single models treat them the same.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Example Walkthrough -->
+    <div class="section">
+        <h2>Let's Walk Through An Example</h2>
+        <p class="intro">Here's a real question from TAT-QA. I'll show you how both pipelines handle it.</p>
+
+        <div class="example-box">
+            <div class="example-header">The Question</div>
+            <div class="question">
+                "What was the percentage change in total contract revenues from 2018 to 2019?"
+            </div>
+
+            <div class="table-sample">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Contract Type</th>
+                            <th>2018 ($M)</th>
+                            <th>2019 ($M)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fixed Price</td>
+                            <td>1,146.2</td>
+                            <td>1,452.4</td>
+                        </tr>
+                        <tr>
+                            <td>Cost Plus</td>
+                            <td>67.5</td>
+                            <td>68.8</td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td>56.7</td>
+                            <td>44.1</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="context-snippet">
+                <strong>Context:</strong> The company's contract revenue increased primarily due to growth in Fixed Price contracts, which are typically longer-term engagements with defense clients. "Other" category contracts, which include time-and-material deals, decreased as the company focused on more predictable revenue streams. Cost Plus contracts remained relatively stable year-over-year.
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline 1 -->
+    <div class="section">
+        <h2>Pipeline 1: Router-Based</h2>
+        <p class="intro">The first approach uses a router to classify questions and send them to specialized agents.</p>
+
+        <img src="pipeline1.png" alt="Pipeline 1 Architecture" class="pipeline-img">
+
+        <div class="step-by-step">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Dynamic Router Classifies</h4>
+                <p>The router sees "percentage change" and "revenues" and classifies this as an <strong>arithmetic</strong> question. It routes to the Financial Agent.</p>
+                <div class="code-output">Router decision: ARITHMETIC (confidence: 0.87)</div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>Table Agent Extracts Values</h4>
+                <p>TAPAS pulls the relevant numbers from the table:</p>
+                <div class="code-output">2018 total: 1146.2 + 67.5 + 56.7 = 1270.4
+2019 total: 1452.4 + 68.8 + 44.1 = 1565.3</div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h4>Financial Agent Calculates</h4>
+                <p>Gemini 2.5 Flash uses Chain-of-Thought to work through the math:</p>
+                <div class="agent-output">
+                    <strong>CoT Trace:</strong><br>
+                    Step 1: Calculate 2018 total = 1,270.4M<br>
+                    Step 2: Calculate 2019 total = 1,565.3M<br>
+                    Step 3: Change = 1,565.3 - 1,270.4 = 294.9M<br>
+                    Step 4: Percentage = (294.9 / 1,270.4) × 100 = 23.2%
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <h4>Personalized Summary</h4>
+                <p>Based on detected user type (financial analyst), it formats a technical response:</p>
+                <div class="final-answer">
+                    Total contract revenues increased 23.2% YoY (from $1,270.4M to $1,565.3M). Growth driven primarily by Fixed Price contracts (+26.7%), offsetting declines in Other category (-22.2%). Cost Plus remained flat (+1.9%).
+                </div>
+            </div>
+        </div>
+
+        <div class="rag-highlight">
+            <h4>Problem: Context Loss</h4>
+            <p>Notice how the router only passes the question to downstream agents. The Financial Agent never sees the context about "time-and-material deals" or the company's strategic shift. It can calculate the percentage, but it misses <em>why</em> the numbers changed.</p>
+        </div>
+    </div>
+
+    <!-- Pipeline 2 -->
+    <div class="section">
+        <h2>Pipeline 2: RAG-Grounded Sequential</h2>
+        <p class="intro">The second pipeline uses retrieval to ground context and passes full reasoning traces forward.</p>
+
+        <img src="pipeline2.png" alt="Pipeline 2 Architecture" class="pipeline-img">
+
+        <div class="step-by-step">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h4>Question Embedding</h4>
+                <p>BGE-large-en-v1.5 encodes the question into a 1024-dimensional vector.</p>
+                <div class="code-output">Embedding shape: [1, 1024]
+Query: "percentage change in total contract revenues..."</div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <h4>FAISS Retrieval (RAG Step)</h4>
+                <p>Vector search retrieves the top-3 most relevant passages from the full financial report:</p>
+                <div class="agent-output">
+                    <strong>Top 3 Passages:</strong><br>
+                    1. "Fixed Price contracts increased due to defense engagements..." (similarity: 0.89)<br>
+                    2. "Other category time-and-material deals decreased as company focused..." (similarity: 0.85)<br>
+                    3. "Cost Plus contracts remained stable year-over-year..." (similarity: 0.81)
+                </div>
+                <p style="margin-top: 1rem;">Instead of processing 47 paragraphs (token overflow), the Context Agent gets exactly the 3 most relevant passages. This is the RAG innovation.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <h4>TabuSynth: Table Extraction</h4>
+                <p>TAPAS extracts structured facts with CoT reasoning:</p>
+                <div class="code-output">Fixed Price: +$306.2M (+26.7%)
+Cost Plus: +$1.3M (+1.9%)
+Other: -$12.6M (-22.2%)</div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <h4>Contextron: RAG-Grounded Context</h4>
+                <p>FLAN-T5-XL processes only the top-3 retrieved passages and condenses them:</p>
+                <div class="agent-output">
+                    <strong>Contextron Output:</strong><br>
+                    Revenue growth driven by Fixed Price defense contracts. Other category (time-and-material) declined as strategic shift toward predictable revenue streams. Cost Plus stable.
+                </div>
+                <p style="margin-top: 1rem;">Because retrieval filtered to relevant passages, the Context Agent focuses on what matters instead of generic boilerplate from the full report.</p>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <h4>Selectra: Persona Detection</h4>
+                <p>FLAN-T5-small infers user type from question phrasing:</p>
+                <div class="code-output">Detected persona: Financial Analyst
+Reasoning: Technical terminology, YoY comparison</div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">6</div>
+                <h4>SummaCraft: Final Orchestration</h4>
+                <p>Mistral 7B receives table facts, condensed context, persona and all CoT traces:</p>
+                <div class="final-answer">
+                    Total contract revenues grew 23.2% YoY, from $1,270.4M (2018) to $1,565.3M (2019). Fixed Price contracts drove growth at +$306.2M (+26.7%), reflecting expanded defense engagements. The "Other" category declined $12.6M (-22.2%) as the company strategically shifted away from time-and-material deals toward more predictable revenue streams. Cost Plus contracts remained essentially flat at +$1.3M (+1.9%).
+                </div>
+            </div>
+        </div>
+
+        <div class="rag-highlight">
+            <h4>Why This Works Better</h4>
+            <p><strong>RAG solves token limits:</strong> Instead of 47 paragraphs (exceeds FLAN-T5-XL's context), we pass 3 focused passages.</p>
+            <p style="margin-top: 0.5rem;"><strong>Context flows forward:</strong> SummaCraft sees not just "23.2%" but the reasoning about strategic shifts and defense contracts.</p>
+            <p style="margin-top: 0.5rem;"><strong>CoT traces enable debugging:</strong> If the answer is wrong, we can trace back to see where each agent's reasoning broke down.</p>
+        </div>
+    </div>
+
+    <!-- Comparison -->
+    <div class="section-tight">
+        <h2>Pipeline Comparison</h2>
+
+        <div class="comparison">
+            <div class="pipeline-box">
+                <h3>Router-Based</h3>
+                <p class="pro">✓ Fast classification</p>
+                <p class="pro">✓ Simple architecture</p>
+                <p class="con">✗ Router misclassifies hybrid questions</p>
+                <p class="con">✗ Context lost at routing step</p>
+                <p class="con">✗ No retrieval, processes all text or nothing</p>
+            </div>
+
+            <div class="pipeline-box">
+                <h3>RAG-Grounded Sequential</h3>
+                <p class="pro">✓ Retrieval filters noise</p>
+                <p class="pro">✓ Context preserved across stages</p>
+                <p class="pro">✓ CoT traces enable transparency</p>
+                <p class="con">✗ More complex to implement</p>
+                <p class="con">✗ Requires embedding all passages upfront</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="section-tight">
+        <h2>Results</h2>
+        <p class="intro">Single-shot Chain-of-Thought prompting consistently beats zero-shot across all components.</p>
+
+        <div class="metrics">
+            <div class="metric-bar">
+                <div class="metric-label">Dynamic Routing</div>
+                <div class="bar-container">
+                    <div class="bar">
+                        <div class="bar-fill" style="--width: 49.6%">49.6%</div>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" style="--width: 54.7%">54.7%</div>
+                    </div>
+                    <span class="improvement">+5.1pp</span>
+                </div>
+            </div>
+
+            <div class="metric-bar">
+                <div class="metric-label">Arithmetic Reasoning</div>
+                <div class="bar-container">
+                    <div class="bar">
+                        <div class="bar-fill" style="--width: 58.2%">58.2%</div>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" style="--width: 60.9%">60.9%</div>
+                    </div>
+                    <span class="improvement">+2.7pp</span>
+                </div>
+            </div>
+
+            <div class="metric-bar">
+                <div class="metric-label">Logical Reasoning</div>
+                <div class="bar-container">
+                    <div class="bar">
+                        <div class="bar-fill" style="--width: 69.3%">69.3%</div>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" style="--width: 74.1%">74.1%</div>
+                    </div>
+                    <span class="improvement">+4.8pp</span>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top: 3rem; color: #666; font-size: 1.1rem;">Component-level metrics: Table Agent F1 25.3%, Context Agent F1 29.4%. These reflect the difficulty of extraction and grounding on complex financial data, but don't fully capture context integration quality (the real innovation here).</p>
+    </div>
+
+    <!-- Tech Stack -->
+    <div class="section-tight">
+        <h2>What I Built With</h2>
+        <div class="problem-grid">
+            <div class="problem-card">
+                <h3>BGE-large-en-v1.5</h3>
+                <p>1024-dim embeddings for semantic retrieval. BAAI's encoder beats keyword matching for passage relevance.</p>
+            </div>
+            <div class="problem-card">
+                <h3>FAISS</h3>
+                <p>Facebook's vector search. L2 distance over 2,757 indexed contexts with sub-millisecond lookup.</p>
+            </div>
+            <div class="problem-card">
+                <h3>TAPAS</h3>
+                <p>Pre-trained table QA model. Understands cell structure and aggregation that general models miss.</p>
+            </div>
+            <div class="problem-card">
+                <h3>FLAN-T5-XL</h3>
+                <p>Instruction-tuned for text condensation. Processes retrieved passages into grounded context.</p>
+            </div>
+            <div class="problem-card">
+                <h3>FLAN-T5-small</h3>
+                <p>Lightweight persona classifier. Zero-shot prompting adapts to new user types without retraining.</p>
+            </div>
+            <div class="problem-card">
+                <h3>Gemini 2.5 Flash / Mistral 7B</h3>
+                <p>Final orchestration. Synthesizes all agent outputs with single-shot CoT prompting.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate bars on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const fills = entry.target.querySelectorAll('.bar-fill');
+                    fills.forEach(fill => fill.classList.add('animate'));
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.metrics').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>
