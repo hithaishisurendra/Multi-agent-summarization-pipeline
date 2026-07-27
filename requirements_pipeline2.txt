@@ -1,0 +1,20 @@
+# Pipeline 2 Dependencies
+# Install with: pip install -r requirements_pipeline2.txt
+
+# Core ML libraries
+torch>=2.0.0
+transformers>=4.30.0
+
+# Embeddings and Vector Search
+sentence-transformers>=2.2.0
+faiss-cpu>=1.7.4
+
+# LLM APIs
+google-generativeai>=0.3.0
+
+# Data handling
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Utilities
+tqdm>=4.65.0

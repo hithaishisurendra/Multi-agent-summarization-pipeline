@@ -1,3 +1,10 @@
+# API Keys and Secrets
 .env
 API keys.txt
 *.key
+
+# Interview Preparation Materials (keep private)
+INTERVIEW_SCRIPT.md
+COMPREHENSIVE_INTERVIEW_PREP.md
+INTERVIEW_WALKTHROUGH.md
+explanation.md
