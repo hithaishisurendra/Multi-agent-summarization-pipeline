@@ -1,4 +1,4 @@
-# Multi-Agent Table Question-Answering with RAG
+# Multi-Agent Table-and-Text Question-Answering with RAG
 
 Question-answering system for hybrid table-and-text financial data using specialized agents and retrieval-augmented generation. Solves token efficiency and context preservation challenges through sequential multi-agent architecture.
 
